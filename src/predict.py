@@ -21,7 +21,7 @@ from src.config import CLASSES, IMG_SIZE, MODELS, ROOT  # noqa: E402
 from src.data import to_tensor  # noqa: E402
 from src.health import health_indices, leaf_mask  # noqa: E402
 
-DEFAULT_CLASSIFIER = MODELS / "yolo26_cls_sfr.pt"
+DEFAULT_CLASSIFIER = MODELS / "yolo26_cls_sfr_bgaug.pt"  # proposed model + background augmentation (most robust, REPORT §8.4)
 ADVISORY_PATH = ROOT / "app" / "advisory.json"
 
 

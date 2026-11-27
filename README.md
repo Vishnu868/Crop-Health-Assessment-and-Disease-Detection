@@ -31,24 +31,40 @@ Held-out **test split of 1,200 real PlantVillage images** (240 per class, never 
 | YOLO11n-cls | 99.50% | 0.9950 | 1.0000 | 85.8% |
 | YOLO26n-cls + SFR, no ImageNet pretraining | 97.33% | 0.9733 | 0.9980 | 52.6% |
 | Small CNN from scratch | 98.58% | 0.9858 | 0.9996 | 62.5% |
+| **YOLO26n-cls + SFR + background augmentation (deployed)** | **99.25%** | 0.9925 | 0.9998 | **98.7%** |
 | Colour + texture features + random forest | 95.67% | 0.9563 | 0.9966 | - |
 | Colour + texture features + logistic regression | 90.67% | 0.9066 | 0.9881 | - |
 | Majority class | 20.00% | 0.0667 | - | - |
 
 <!-- DETECTION_TABLE -->
 
+**SFR ablation over three seeds:** YOLO26n-cls + SFR **99.36 ± 0.13%**, YOLO26n-cls **99.31 ± 0.21%**. The
+difference is under one test image, so SFR gives **no measurable gain** on PlantVillage.
+
+**Background robustness:** the same 1,200 test leaves, with only the background replaced.
+
+| Model | Original | Black | Random flat colour (unseen) | Random texture (unseen) |
+|---|---|---|---|---|
+| YOLO26n-cls + SFR | 99.25% | 59.08% | 83.33% | 77.92% |
+| YOLO26n-cls | 99.33% | 82.67% | 83.42% | 74.83% |
+| YOLO11n-cls | 99.50% | 85.83% | 87.33% | 72.17% |
+| Small CNN from scratch | 98.58% | 62.50% | 53.83% | 38.58% |
+| **YOLO26n-cls + SFR + background aug.** | **99.25%** | **98.67%** | **92.17%** | **81.67%** |
+
 **Honest reading of these numbers**
-* Every deep model is above 97% and the classical random forest reaches 95.7%. PlantVillage (single leaves, lab
-  background) is an easy benchmark, and the attention module (SFR) gives **no measurable gain** on it.
-  The with/without-SFR differences are 0-1 test images. See the multi-seed check in [REPORT.md](REPORT.md).
-* With the leaf's **background removed**, accuracy drops to 53-86%: the models partly rely on the lab
-  background, lighting and crop identity. Training with background augmentation narrows this gap (REPORT.md §8.4).
-  **Validate on real field photos before trusting it on a farm.**
+* Every deep model is above 97%, and a classical random forest reaches 95.7%. PlantVillage, with single leaves on
+  a lab background, is an easy benchmark.
+* With the background changed, accuracy falls to 39-88%. The models partly rely on the lab background, lighting
+  and crop identity.
+* Training on background-removed images 50% of the time fixes much of this at no cost on normal images.
+  That model is the app's default (`results/models/yolo26_cls_sfr_bgaug.pt`).
+* **Validate on real field photos before trusting it on a farm.**
 
 | | |
 |---|---|
 | ![Confusion matrices](docs/figures/cls_confusion_matrix.png) | ![Grad-CAM](docs/figures/gradcam.png) |
-| ![Model comparison](docs/figures/cls_model_comparison.png) | ![Health indices](docs/figures/health_lesion_maps.png) |
+| ![Model comparison](docs/figures/cls_model_comparison.png) | ![Background robustness](docs/figures/cls_background_robustness.png) |
+| ![SFR seeds](docs/figures/cls_sfr_seeds.png) | ![Health indices](docs/figures/health_lesion_maps.png) |
 
 ## Results reported in the original project
 
@@ -120,8 +136,9 @@ Raw data is not committed. `scripts/download_plantvillage.py` fetches exactly th
 ![Model](docs/figures/model_architecture.png)
 
 **CPU budget (documented):** no GPU was available. Classifiers use 128-px inputs (~25 s/epoch on 4 cores).
-Detectors are trained on a fixed 35% subset of the training split (~1,960 images) for 15 epochs at 256 px and
-evaluated on the full test split.
+Detectors are trained on a class × crop stratified 35% subset of the training split (1,960 images) for 15
+epochs at 256 px, and evaluated on the full test split. Ultralytics' own `fraction=` keeps the first N files in
+sorted order and silently dropped whole crops in our first attempt (REPORT.md §8.5).
 
 ## Project structure
 
@@ -139,11 +156,12 @@ evaluated on the full test split.
 │   ├── train_classifier.py        # classifier training / evaluation (also --data synthetic sanity check)
 │   ├── train_detector.py          # YOLO26n / YOLO11n / YOLOv5n (± SFR) detector training / evaluation
 │   ├── baseline_features.py       # colour + texture features → LogReg / RF baselines
+│   ├── eval_backgrounds.py        # background-robustness test (black / random colour / texture)
 │   └── predict.py                 # inference: disease + confidence + advisory + health (+ boxes, Grad-CAM)
 ├── app/                           # Flask API, web interface, advisory.json
 ├── mobile_app/                    # Flutter client (source)
 ├── firmware/                      # ESP32-CAM capture, NodeMCU sensors + pump (Arduino source)
-├── tests/test_pipeline.py         # pytest (17 tests)
+├── tests/test_pipeline.py         # pytest (18 tests)
 ├── results/                       # metrics.json per model, summary.md, trained models (results/models/*.pt)
 ├── docs/                          # Project_Guide.pdf, its builder, figures
 ├── screenshots/                   # surviving screenshots of the original project
@@ -165,6 +183,7 @@ Train and evaluate (numbers and figures land in `results/` and `docs/figures/`):
 python -m src.train_classifier --model yolo26_cls_sfr --epochs 15        # proposed classifier, ~7-10 min on CPU
 python -m src.train_detector --arch yolo26n --sfr --epochs 15 --fraction 0.35
 python -m src.baseline_features
+python -m src.eval_backgrounds                                           # background-robustness test
 bash scripts/run_classification.sh && bash scripts/run_detection.sh      # every experiment in REPORT.md
 python scripts/make_figures.py
 ```
@@ -190,8 +209,8 @@ pytest -q
 
 ```json
 {
-  "disease": "Late Blight", "class": "Late_Blight", "confidence": 0.969,
-  "top3": [{"class": "Late_Blight", "prob": 0.969}, {"class": "Healthy", "prob": 0.009}, {"class": "Bacterial_spot", "prob": 0.009}],
+  "disease": "Late Blight", "class": "Late_Blight", "confidence": 0.949,
+  "top3": [{"class": "Late_Blight", "prob": 0.949}, {"class": "Bacterial_spot", "prob": 0.014}, {"class": "Powder_Mildew", "prob": 0.014}],
   "fertilizer": "Avoid excess nitrogen; apply potassium and phosphorus (e.g. NPK 10-26-26) ...",
   "pesticide": "Systemic plus contact fungicides such as metalaxyl-M + mancozeb ...",
   "precautions": "Destroy infected plants and volunteer potatoes; use resistant varieties ...",

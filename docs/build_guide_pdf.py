@@ -516,8 +516,22 @@ FIGURE("cls_per_class.png", "Per-class precision, recall and F1 of the proposed 
 FIGURE("cls_roc.png", "One-vs-rest ROC curves (log-scaled false-positive axis, so the differences are visible).",
        10)
 FIGURE("gradcam.png", "Grad-CAM and SFR attention maps on random test images.")
-FIGURE("cls_background_robustness.png", "Every classifier on the normal test images and on the same images with "
-       "the background removed.")
+P("<b>Leaf or background? The robustness test.</b>")
+SIMPLE("We cut each test leaf out and pasted it onto new backgrounds: black, a random flat colour and a random "
+       "blotchy texture. The leaf is identical; only the backdrop changes. A model that really looks at the leaf "
+       "should not care. Think of recognising a friend's face on a beach and then in a classroom.")
+ROB = load("classification/background_robustness")
+if ROB:
+    TABLE([["Model", "Original", "Black", "Flat colour", "Texture"]] +
+          [[CLS_NAMES[k], *[pct(ROB[k][v]["accuracy"], 1) for v in ["original", "black", "flat", "texture"]]]
+           for k in CLS_NAMES if k in ROB], [6.6, 2.3, 2.3, 2.6, 2.4], bold_rows=(7,))
+FIGURE("background_variants.png", "The four background variants. Leaf pixels are never changed (small holes come "
+       "from PlantVillage's own segmentation masks).", 12)
+FIGURE("cls_background_robustness.png", "Accuracy of every classifier for each background variant.")
+TECH("The flat and texture backgrounds are random and were seen by no model in training, not even the "
+     "background-augmented one (which saw only black backgrounds). The background-augmented model is the most "
+     "robust on every variant, so it was made the default model of the app "
+     "(<font face='DVM'>results/models/yolo26_cls_sfr_bgaug.pt</font>).")
 P("<b>Is SFR worth it? Three seeds each.</b>")
 SIMPLE("One run can be lucky. We trained the with- and without-SFR models three times each, with different random "
        "seeds, and compare the averages and the spread.")
@@ -629,8 +643,8 @@ TECH(["Pump control with hysteresis: ON when moisture &lt; 35% (40% if T &gt; 32
       "Disease-risk flag: 'high' when RH &gt; 85% and 15 °C ≤ T ≤ 28 °C (leaf-wetness conditions favourable to "
       "late blight and mildew), 'medium' when RH &gt; 70%.",
       "Example response of POST /predict:"])
-CODE('{"disease": "Late Blight", "class": "Late_Blight", "confidence": 0.969,\n'
-     ' "top3": [{"class": "Late_Blight", "prob": 0.969}, ...],\n'
+CODE('{"disease": "Late Blight", "class": "Late_Blight", "confidence": 0.949,\n'
+     ' "top3": [{"class": "Late_Blight", "prob": 0.949}, ...],\n'
      ' "fertilizer": "Avoid excess nitrogen; apply potassium and phosphorus ...",\n'
      ' "pesticide": "Systemic plus contact fungicides such as metalaxyl-M + mancozeb ...",\n'
      ' "precautions": "Destroy infected plants and volunteer potatoes ...",\n'

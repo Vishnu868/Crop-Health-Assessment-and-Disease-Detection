@@ -15,6 +15,29 @@ All numbers: held-out **test split, 1,200 real PlantVillage images** (240 per cl
 | YOLO11n-cls | ImageNet | 1.54 M | 99.50% | 99.50% | 1.0000 | 85.83% | 5.7 min |
 | YOLO26n-cls + SFR, no pretraining | no | 1.56 M | 97.33% | 97.33% | 0.9980 | 52.58% | 5.8 min |
 | Small CNN (scratch) | no | 0.66 M | 98.58% | 98.58% | 0.9996 | 62.50% | 44.5 min |
+| YOLO26n-cls + SFR, background aug. | ImageNet | 1.56 M | 99.25% | 99.25% | 0.9998 | 98.67% | 6.5 min |
+
+## Background robustness (same 1,200 test leaves, background replaced)
+
+| Model | Original | Black | Random flat colour | Random colour texture |
+|---|---|---|---|---|
+| YOLO26n-cls + SFR (proposed) | 99.25% | 59.08% | 83.33% | 77.92% |
+| YOLO26n-cls | 99.33% | 82.67% | 83.42% | 74.83% |
+| YOLO11n-cls + SFR | 99.50% | 84.33% | 84.17% | 73.00% |
+| YOLO11n-cls | 99.50% | 85.83% | 87.33% | 72.17% |
+| YOLO26n-cls + SFR, no pretraining | 97.33% | 52.58% | 53.00% | 44.50% |
+| Small CNN (scratch) | 98.58% | 62.50% | 53.83% | 38.58% |
+| YOLO26n-cls + SFR, background aug. | 99.25% | 98.67% | 92.17% | 81.67% |
+
+## SFR ablation over three seeds (42, 1, 2)
+
+| Model | Runs | Accuracy (mean ± s.d.) | Macro-F1 | Acc. background removed |
+|---|---|---|---|---|
+| YOLO26n-cls + SFR | 3 | 99.36 ± 0.13% | 99.36 ± 0.13% | 66.94 ± 7.00% |
+| YOLO26n-cls | 3 | 99.31 ± 0.21% | 99.31 ± 0.21% | 70.33 ± 12.55% |
+
+Individual runs: YOLO26n-cls + SFR seed 42: 99.25% / bg-removed 59.08%; YOLO26n-cls + SFR seed 1: 99.50% / bg-removed 69.25%; YOLO26n-cls + SFR seed 2: 99.33% / bg-removed 72.50%; YOLO26n-cls seed 42: 99.33% / bg-removed 82.67%; YOLO26n-cls seed 1: 99.50% / bg-removed 57.58%; YOLO26n-cls seed 2: 99.08% / bg-removed 70.75%
+
 
 Per-class classification report (YOLO26n-cls + SFR):
 ```

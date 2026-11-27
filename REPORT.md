@@ -29,7 +29,8 @@ images.
   within ±0.3 points of each other.
 * A background-removal test exposes a shortcut. Accuracy falls to 53-86% when the lab background is blacked out,
   so the models partly rely on the background and lighting rather than the lesions. Training with
-  background-swap augmentation reduces this gap (§8.4).
+  background-removal augmentation keeps 99.25% on normal images and raises accuracy on unseen random
+  backgrounds to 82-92% (§8.4). The deployed app uses this model.
 
 We report these limits explicitly. The system should be validated on field photographs before it is used on a farm.
 
@@ -267,7 +268,18 @@ All results are on the **held-out test split: 1,200 real images, 240 per class**
 
 ### 7.1 Classification
 
-<!-- CLS_TABLE -->
+| Model | Params | Accuracy | Macro-F1 | Macro AUC | Train time |
+|---|---|---|---|---|---|
+| **YOLO26n-cls + SFR (proposed)** | 1.56 M | 99.25% | 0.9925 | 0.9996 | 10.0 min |
+| YOLO26n-cls (no SFR) | 1.54 M | 99.33% | 0.9933 | 1.0000 | 7.7 min |
+| YOLO11n-cls + SFR | 1.56 M | 99.50% | 0.9950 | 1.0000 | 6.3 min |
+| YOLO11n-cls | 1.54 M | 99.50% | 0.9950 | 1.0000 | 5.7 min |
+| YOLO26n-cls + SFR, no ImageNet pretraining | 1.56 M | 97.33% | 0.9733 | 0.9980 | 5.8 min |
+| Small CNN from scratch | 0.66 M | 98.58% | 0.9858 | 0.9996 | 44.5 min |
+| YOLO26n-cls + SFR + background augmentation | 1.56 M | 99.25% | 0.9925 | 0.9998 | 6.5 min |
+| Colour + texture features + random forest | - | 95.67% | 0.9563 | 0.9966 | 0.2 min |
+| Colour + texture features + logistic regression | - | 90.67% | 0.9066 | 0.9881 | 0.2 min |
+| Majority class (chance) | - | 20.00% | 0.0667 | - | - |
 
 ![Model comparison](docs/figures/cls_model_comparison.png)
 
@@ -306,7 +318,19 @@ matches the background finding below.
 
 ### 7.3 Is the attention module useful? (three-seed ablation)
 
-<!-- SEED_TABLE -->
+| Model | Seeds | Test accuracy (mean ± s.d.) | Individual runs | Background removed (mean ± s.d.) |
+|---|---|---|---|---|
+| YOLO26n-cls + SFR | 42, 1, 2 | 99.36 ± 0.13% | 99.25, 99.50, 99.33 | 66.9 ± 7.0% |
+| YOLO26n-cls | 42, 1, 2 | 99.31 ± 0.21% | 99.33, 99.50, 99.08 | 70.3 ± 12.5% |
+
+With SFR, the mean test accuracy is +0.06 points, which is **0.7 test images** out of 1,200. That is
+smaller than the seed-to-seed spread of either model (s.d. 0.13 and
+0.21 points). The background-removed accuracy varies far more between seeds
+(59-72% with SFR,
+58-83% without). How much a model relies on the background
+is dominated by the random seed (initialisation and data order), not by SFR. **Conclusion: SFR gives
+no measurable gain on PlantVillage.** The seed-42 run of the proposed model happened to be the most
+background-dependent one.
 
 ![SFR seeds](docs/figures/cls_sfr_seeds.png)
 
@@ -352,7 +376,36 @@ matters. Testing that needs a field dataset (§11).
 
 ### 8.4 Background augmentation
 
-<!-- BGAUG_TEXT -->
+We re-trained the proposed model with `--bg-aug 0.5`: each training image is replaced by its background-removed
+version with probability 0.5. We then tested every classifier on the same 1,200 test leaves pasted onto four
+backgrounds. The *flat* and *texture* backgrounds are random and were never seen in training by any model,
+including the augmented one (`src/eval_backgrounds.py`).
+
+| Model | Original | Black background | Random flat colour | Random colour texture |
+|---|---|---|---|---|
+| **YOLO26n-cls + SFR (proposed)** | 99.25% | 59.08% | 83.33% | 77.92% |
+| YOLO26n-cls (no SFR) | 99.33% | 82.67% | 83.42% | 74.83% |
+| YOLO11n-cls + SFR | 99.50% | 84.33% | 84.17% | 73.00% |
+| YOLO11n-cls | 99.50% | 85.83% | 87.33% | 72.17% |
+| YOLO26n-cls + SFR, no ImageNet pretraining | 97.33% | 52.58% | 53.00% | 44.50% |
+| Small CNN from scratch | 98.58% | 62.50% | 53.83% | 38.58% |
+| YOLO26n-cls + SFR + background augmentation | 99.25% | 98.67% | 92.17% | 81.67% |
+
+![Background variants](docs/figures/background_variants.png)
+![Background robustness](docs/figures/cls_background_robustness.png)
+
+* Background augmentation costs **nothing on normal images** (99.25%).
+* It makes the black-background case almost free (98.67%).
+* It is the most robust model on both unseen backgrounds: 92.2% on flat colours and 81.7% on textures, against
+  72-87% and 39-78% for the other models.
+* Models trained from scratch (the small CNN and YOLO26 without pretraining) are by far the most
+  background-dependent. ImageNet features transfer better to new contexts.
+* Even the best model still loses 18 points on busy textured backgrounds. Real field photos, with soil, other
+  leaves and shadows, will be harder still.
+
+Because of this experiment, the background-augmented model (`results/models/yolo26_cls_sfr_bgaug.pt`) is the
+**default model of `src/predict.py` and the web app**. The plain seed-42 model stays the "proposed" row in the
+ablation tables, so the comparison with the no-SFR model remains like-for-like.
 
 ### 8.5 A pitfall: subset sampling for the detectors
 
