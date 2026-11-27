@@ -325,7 +325,7 @@ def fig_detection(res):
     ax.set_ylim(0, 105)
     ax.set_ylabel("%")
     ax.set_title("Detectors on the held-out test split (1,200 images)")
-    ax.legend(ncols=2, loc="lower right")
+    ax.legend(ncols=2, loc="upper center", bbox_to_anchor=(0.5, -0.2))
     ax.grid(axis="x", visible=False)
     save(fig, "det_model_comparison.png")
 
