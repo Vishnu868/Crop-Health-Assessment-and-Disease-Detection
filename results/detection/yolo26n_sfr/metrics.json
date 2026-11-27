@@ -1,0 +1,156 @@
+{
+  "arch": "yolo26n",
+  "sfr": true,
+  "epochs": 15,
+  "imgsz": 256,
+  "train_fraction": 0.35,
+  "train_minutes": 22.37003603776296,
+  "params": 2557631,
+  "test": {
+    "precision": 0.9849023903302975,
+    "recall": 0.9807010925948548,
+    "mAP50": 0.9929245513844647,
+    "mAP50_95": 0.9576362090463416,
+    "per_class": {
+      "Bacterial_spot": {
+        "precision": 0.9915241683953804,
+        "recall": 0.9748549566829036,
+        "mAP50": 0.9976174012255797,
+        "mAP50_95": 0.9596315928464371
+      },
+      "Black_rot": {
+        "precision": 0.9958040680166491,
+        "recall": 0.9888624871793021,
+        "mAP50": 0.9871287128712875,
+        "mAP50_95": 0.935521481725851
+      },
+      "Healthy": {
+        "precision": 0.9521871818361971,
+        "recall": 1.0,
+        "mAP50": 0.9970239446547033,
+        "mAP50_95": 0.9678919684762948
+      },
+      "Late_Blight": {
+        "precision": 0.9956436135292747,
+        "recall": 0.9522880191120686,
+        "mAP50": 0.9945253317523024,
+        "mAP50_95": 0.9476120385334026
+      },
+      "Powder_Mildew": {
+        "precision": 0.9893529198739863,
+        "recall": 0.9875,
+        "mAP50": 0.98832736641845,
+        "mAP50_95": 0.9775239636497233
+      }
+    }
+  },
+  "test_image_level": {
+    "accuracy": 0.9858333333333333,
+    "macro_f1": 0.9858927168962122,
+    "no_detection": 0,
+    "conf_threshold": 0.25,
+    "confusion_matrix": [
+      [
+        232,
+        0,
+        5,
+        3,
+        0,
+        0
+      ],
+      [
+        0,
+        240,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        240,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        4,
+        235,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        4,
+        0,
+        236,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "confusion_labels": [
+      "Bacterial_spot",
+      "Black_rot",
+      "Healthy",
+      "Late_Blight",
+      "Powder_Mildew",
+      "no_detection"
+    ],
+    "per_class": {
+      "Bacterial_spot": {
+        "precision": 0.9957081545064378,
+        "recall": 0.9666666666666667,
+        "f1-score": 0.9809725158562368,
+        "support": 240.0
+      },
+      "Black_rot": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 240.0
+      },
+      "Healthy": {
+        "precision": 0.9486166007905138,
+        "recall": 1.0,
+        "f1-score": 0.973630831643002,
+        "support": 240.0
+      },
+      "Late_Blight": {
+        "precision": 0.9873949579831933,
+        "recall": 0.9791666666666666,
+        "f1-score": 0.9832635983263598,
+        "support": 240.0
+      },
+      "Powder_Mildew": {
+        "precision": 1.0,
+        "recall": 0.9833333333333333,
+        "f1-score": 0.9915966386554622,
+        "support": 240.0
+      },
+      "accuracy": 0.9858333333333333,
+      "macro avg": {
+        "precision": 0.9863439426560291,
+        "recall": 0.9858333333333332,
+        "f1-score": 0.9858927168962122,
+        "support": 1200.0
+      },
+      "weighted avg": {
+        "precision": 0.9863439426560289,
+        "recall": 0.9858333333333333,
+        "f1-score": 0.985892716896212,
+        "support": 1200.0
+      }
+    }
+  }
+}
