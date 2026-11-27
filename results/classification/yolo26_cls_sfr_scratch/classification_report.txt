@@ -1,0 +1,11 @@
+                precision    recall  f1-score   support
+
+Bacterial_spot     0.9869    0.9417    0.9638       240
+     Black_rot     0.9634    0.9875    0.9753       240
+       Healthy     0.9522    0.9958    0.9735       240
+   Late_Blight     0.9831    0.9708    0.9769       240
+ Powder_Mildew     0.9831    0.9708    0.9769       240
+
+      accuracy                         0.9733      1200
+     macro avg     0.9738    0.9733    0.9733      1200
+  weighted avg     0.9738    0.9733    0.9733      1200
