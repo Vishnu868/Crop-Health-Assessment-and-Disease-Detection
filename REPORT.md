@@ -336,7 +336,23 @@ background-dependent one.
 
 ### 7.4 Detection
 
-<!-- DET_TABLE -->
+<!-- DET_BEGIN -->
+| Detector | Params | P | R | mAP@0.5 | mAP@0.5:0.95 | Image-level acc. | Train time |
+|---|---|---|---|---|---|---|---|
+| **YOLO26n + SFR (proposed)** | 2.56 M | 0.985 | 0.981 | 0.993 | 0.958 | 98.58% | 22 min |
+
+Per-class test results of YOLO26n + SFR:
+
+| Class | P | R | mAP@0.5 | mAP@0.5:0.95 |
+|---|---|---|---|---|
+| Bacterial_spot | 0.992 | 0.975 | 0.998 | 0.960 |
+| Black_rot | 0.996 | 0.989 | 0.987 | 0.936 |
+| Healthy | 0.952 | 1.000 | 0.997 | 0.968 |
+| Late_Blight | 0.996 | 0.952 | 0.995 | 0.948 |
+| Powder_Mildew | 0.989 | 0.988 | 0.988 | 0.978 |
+
+*YOLO26n, YOLO11n and YOLOv5n detectors (same settings) are still training; their rows will be added here.*
+<!-- DET_END -->
 
 ![Detector comparison](docs/figures/det_model_comparison.png)
 ![Detector confusion matrix](docs/figures/det_confusion_matrix.png)

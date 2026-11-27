@@ -39,6 +39,22 @@ All numbers: held-out **test split, 1,200 real PlantVillage images** (240 per cl
 Individual runs: YOLO26n-cls + SFR seed 42: 99.25% / bg-removed 59.08%; YOLO26n-cls + SFR seed 1: 99.50% / bg-removed 69.25%; YOLO26n-cls + SFR seed 2: 99.33% / bg-removed 72.50%; YOLO26n-cls seed 42: 99.33% / bg-removed 82.67%; YOLO26n-cls seed 1: 99.50% / bg-removed 57.58%; YOLO26n-cls seed 2: 99.08% / bg-removed 70.75%
 
 
+## Detection (YOLO, auto-generated leaf boxes)
+
+| Model | Params | P | R | mAP@0.5 | mAP@0.5:0.95 | Image-level acc. | No detection | Train time |
+|---|---|---|---|---|---|---|---|---|
+| YOLO26n + SFR (proposed) | 2.56 M | 0.985 | 0.981 | 0.993 | 0.958 | 98.58% | 0 | 22 min |
+
+Per-class detection AP (proposed model):
+
+| Class | P | R | mAP@0.5 | mAP@0.5:0.95 |
+|---|---|---|---|---|
+| Bacterial_spot | 0.992 | 0.975 | 0.998 | 0.960 |
+| Black_rot | 0.996 | 0.989 | 0.987 | 0.936 |
+| Healthy | 0.952 | 1.000 | 0.997 | 0.968 |
+| Late_Blight | 0.996 | 0.952 | 0.995 | 0.948 |
+| Powder_Mildew | 0.989 | 0.988 | 0.988 | 0.978 |
+
 Per-class classification report (YOLO26n-cls + SFR):
 ```
                 precision    recall  f1-score   support

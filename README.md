@@ -36,7 +36,15 @@ Held-out **test split of 1,200 real PlantVillage images** (240 per class, never 
 | Colour + texture features + logistic regression | 90.67% | 0.9066 | 0.9881 | - |
 | Majority class | 20.00% | 0.0667 | - | - |
 
-<!-- DETECTION_TABLE -->
+<!-- DET_BEGIN -->
+**Detection** (one automatic leaf box per image; stratified 35% of the training split, 256 px, 15 epochs; full 1,200-image test split):
+
+| Detector | Params | P | R | mAP@0.5 | mAP@0.5:0.95 | Image-level acc. | Train time |
+|---|---|---|---|---|---|---|---|
+| **YOLO26n + SFR (proposed)** | 2.56 M | 0.985 | 0.981 | 0.993 | 0.958 | 98.58% | 22 min |
+
+*YOLO26n, YOLO11n and YOLOv5n detectors (same settings) are still training; their rows will be added here.*
+<!-- DET_END -->
 
 **SFR ablation over three seeds:** YOLO26n-cls + SFR **99.36 ± 0.13%**, YOLO26n-cls **99.31 ± 0.21%**. The
 difference is under one test image, so SFR gives **no measurable gain** on PlantVillage.
