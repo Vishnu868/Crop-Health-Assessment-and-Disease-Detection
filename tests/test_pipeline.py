@@ -196,3 +196,17 @@ def test_flask_api(tiny_checkpoint, monkeypatch):
     assert s.json == {"pump": True, "disease_risk": "high"}
     assert client.get("/api/sensors").json["pump"] is True
     assert client.get("/").status_code == 200
+
+
+def test_background_variants_keep_leaf_pixels():
+    from src.eval_backgrounds import backgrounds
+    X = np.stack([fake_leaf(), fake_leaf(True)])
+    seg = X.copy()
+    m = leaf_mask(X[0])
+    seg[:, ~m] = 0
+    v = backgrounds(X, seg, seed=0)
+    assert set(v) == {"original", "black", "flat", "texture"}
+    for arr in v.values():
+        assert arr.shape == X.shape and arr.dtype == np.uint8
+        assert np.array_equal(arr[:, m], X[:, m])          # leaf untouched
+    assert np.array_equal(v["black"], seg) and not np.array_equal(v["texture"], X)

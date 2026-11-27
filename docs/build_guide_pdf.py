@@ -4,6 +4,7 @@
 """
 import json
 import os
+import numpy as np
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -164,6 +165,16 @@ CLS = {k: load(f"classification/{k}") for k in
 BASE = load("classification/baselines_handcrafted")
 DET = {k: load(f"detection/{k}") for k in ["yolo26n_sfr", "yolo26n", "yolo11n", "yolov5nu"]}
 MAIN = CLS["yolo26_cls_sfr"]
+SEEDS = {}  # SFR ablation: seeds 42, 1, 2
+for _k in ["yolo26_cls_sfr", "yolo26_cls"]:
+    _runs = [m for m in [CLS[_k]] + [load(f"classification/{_k}_seed{s}") for s in (1, 2)] if m]
+    SEEDS[_k] = {"acc": np.array([m["test"]["accuracy"] for m in _runs]),
+                 "bg": np.array([m["test_background_removed"]["accuracy"] for m in _runs])}
+
+
+def mstd(a):
+    return "n/a" if a is None or len(a) == 0 else (
+        f"{a.mean() * 100:.2f} ± {a.std(ddof=1) * 100:.2f}%" if len(a) > 1 else pct(a[0]))
 CLS_NAMES = {"yolo26_cls_sfr": "YOLO26n-cls + SFR (proposed)", "yolo26_cls": "YOLO26n-cls (no SFR)",
              "yolo11_cls_sfr": "YOLO11n-cls + SFR", "yolo11_cls": "YOLO11n-cls",
              "yolo26_cls_sfr_scratch": "YOLO26n-cls + SFR, random init", "small_cnn": "Small CNN (scratch)",
@@ -443,10 +454,20 @@ TECH(["Loss: label-smoothed cross-entropy (ε = 0.05): L = −Σ<sub>i</sub> q<s
 H2("8.2 Training the detector")
 TECH(["Ultralytics trainer with a subclass whose get_model() inserts SFR. Settings: imgsz 256, batch 32, AdamW "
       "lr 0.002 with cosine schedule, 15 epochs, mosaic closed for the last 3 epochs, COCO-pretrained weights.",
-      "CPU budget: each detector trains on a fixed, seeded 35% subset of the training split (~1,960 images). It is "
+      "CPU budget: each detector trains on a class × crop stratified, seeded 35% subset of the training split "
+      "(1,960 images). It is "
       "validated on the full validation split and tested on the full 1,200-image test split. One epoch over all "
       "5,600 images would take ~10 min on this CPU.",
       "Box labels are automatic (from the segmentation mask), one box per image."])
+NOTE(["Our first detector runs used Ultralytics' built-in <font face='DVM'>fraction=0.35</font>. It keeps the "
+      "<i>first</i> 35% of the training files in alphabetical order. Because our file names start with the crop "
+      "(Apple__, Cherry__, ...), every Tomato and Potato image and most Pepper images were silently dropped. The "
+      "detectors then never predicted bacterial spot or late blight (mAP@0.5 about 0.45, image-level accuracy "
+      "about 49%).",
+      "The fix is an explicit stratified file list (<font face='DVM'>stratified_subset_yaml</font> in "
+      "<font face='DVM'>src/train_detector.py</font>). The first-attempt metrics are kept in "
+      "<font face='DVM'>results/detection/_first_attempt_unstratified_subset/</font>. Lesson: always check the "
+      "class histogram of the data the model actually sees."], "A pitfall we hit")
 H2("8.3 Metrics")
 SIMPLE("Accuracy alone can hide problems, so we use several report cards. Precision: 'when the model says late "
        "blight, how often is it right?' Recall: 'of all the late-blight leaves, how many did it find?' F1 combines "
@@ -495,6 +516,15 @@ FIGURE("cls_per_class.png", "Per-class precision, recall and F1 of the proposed 
 FIGURE("cls_roc.png", "One-vs-rest ROC curves (log-scaled false-positive axis, so the differences are visible).",
        10)
 FIGURE("gradcam.png", "Grad-CAM and SFR attention maps on random test images.")
+FIGURE("cls_background_robustness.png", "Every classifier on the normal test images and on the same images with "
+       "the background removed.")
+P("<b>Is SFR worth it? Three seeds each.</b>")
+SIMPLE("One run can be lucky. We trained the with- and without-SFR models three times each, with different random "
+       "seeds, and compare the averages and the spread.")
+TABLE([["Model", "Runs", "Test accuracy", "Background removed"]] +
+      [[CLS_NAMES[k], str(len(v["acc"])), mstd(v["acc"]), mstd(v["bg"])] for k, v in SEEDS.items()],
+      [6.4, 1.6, 4.2, 4.4], bold_rows=(1,))
+FIGURE("cls_sfr_seeds.png", "Each dot is one training run; bars show mean ± one standard deviation.")
 H2("9.2 Detection")
 rows = [["Detector", "P", "R", "mAP@0.5", "mAP@0.5:0.95", "Image-level acc."]]
 for k, d in DET.items():
@@ -556,19 +586,21 @@ TECH([f"<b>Shortcut evidence.</b> Proposed model: {pct(cacc('yolo26_cls_sfr'))} 
        f"{pct(bg['test']['accuracy'])} on normal and {pct(bg['test_background_removed']['accuracy'])} on "
        f"background-removed test images, a much smaller gap.") if bg else
       "<b>Background augmentation</b> results were not available when this PDF was built.",
-      "<b>SFR's contribution.</b> Compare YOLO26n-cls with and without SFR in Section 9. On a dataset where the "
-      "baseline is already above 98%, the remaining headroom is small; differences of a few tenths of a percent "
-      "are within run-to-run noise (one seed per model; ±0.3-0.5% is typical for 1,200 test images).",
+      f"<b>SFR's contribution.</b> Over three seeds, YOLO26n-cls + SFR scores {mstd(SEEDS['yolo26_cls_sfr']['acc'])} "
+      f"and YOLO26n-cls scores {mstd(SEEDS['yolo26_cls']['acc'])}. On a dataset where the baseline is already "
+      "above 98%, the remaining headroom is a handful of test images. The difference is within run-to-run noise, "
+      "so we claim no gain from SFR on PlantVillage.",
       "<b>Classical baselines are strong.</b> A random forest on colour histograms already reaches ~96%, which "
       "confirms that colour carries most of the signal in this dataset.",
-      "<b>Other limitations.</b> Single random split (no cross-validation); a 35% training subset and 15 epochs "
+      "<b>Other limitations.</b> Single random split (no cross-validation; only the SFR ablation is repeated "
+      "over three seeds); a 35% training subset and 15 epochs "
       "for the detectors (CPU budget); automatic boxes; subset of 8,000 of 54,000 PlantVillage images; the health "
       "score is not validated against expert severity; firmware and Flutter code are provided as source but were "
       "not compiled or run on hardware in this rebuild."])
 H2("Future work")
 BUL(["Collect and label field photos (e.g. PlantDoc, or the farm's own ESP32-CAM images) and test on them.",
      "Leaf-level splits and cross-crop validation (train on tomato, test on potato late blight).",
-     "Several seeds and 5-fold cross-validation to put error bars on the SFR ablation.",
+     "5-fold cross-validation and more seeds for every model, not only the SFR ablation.",
      "Multispectral (NIR) camera for a true NDVI, and severity labels to validate the health score.",
      "Export to ONNX/TFLite and run on the phone for offline use; push the irrigation log to a time-series DB."])
 
@@ -597,13 +629,13 @@ TECH(["Pump control with hysteresis: ON when moisture &lt; 35% (40% if T &gt; 32
       "Disease-risk flag: 'high' when RH &gt; 85% and 15 °C ≤ T ≤ 28 °C (leaf-wetness conditions favourable to "
       "late blight and mildew), 'medium' when RH &gt; 70%.",
       "Example response of POST /predict:"])
-CODE('{"disease": "Late Blight", "class": "Late_Blight", "confidence": 0.9987,\n'
-     ' "top3": [{"class": "Late_Blight", "prob": 0.9987}, ...],\n'
+CODE('{"disease": "Late Blight", "class": "Late_Blight", "confidence": 0.969,\n'
+     ' "top3": [{"class": "Late_Blight", "prob": 0.969}, ...],\n'
      ' "fertilizer": "Avoid excess nitrogen; apply potassium and phosphorus ...",\n'
      ' "pesticide": "Systemic plus contact fungicides such as metalaxyl-M + mancozeb ...",\n'
      ' "precautions": "Destroy infected plants and volunteer potatoes ...",\n'
-     ' "health": {"health_score": 71.2, "lesion_fraction": 0.288, "vari": 0.07, ...},\n'
-     ' "low_confidence": false, "latency_ms": 41.3}')
+     ' "health": {"health_score": 58.1, "lesion_fraction": 0.419, "vari": 0.03, ...},\n'
+     ' "low_confidence": false}')
 NOTE("Advisory text is general agronomic guidance compiled for this project. It is not a prescription: always "
      "follow the product label and local extension advice.", "Safety")
 
@@ -683,9 +715,10 @@ QA = [
      "back through a residual with a learned scale γ. With γ = 0 the block is an exact identity, so it can be "
      "inserted into a pretrained network without destroying what the network already knows."),
     ("Did SFR help?",
-     "Compare the with/without-SFR rows in Section 9: on PlantVillage the plain backbone is already above 98%, so "
-     "the remaining differences are small and within single-seed noise. We report that honestly rather than "
-     "claiming a large gain. The learned γ values are non-zero, so the network does use the refinement."),
+     f"No measurable gain. Over three seeds: {mstd(SEEDS['yolo26_cls_sfr']['acc'])} with SFR vs "
+     f"{mstd(SEEDS['yolo26_cls']['acc'])} without. On PlantVillage the plain backbone is already above 98%, so "
+     "there is almost nothing left to fix. We report that honestly rather than claiming a gain. The learned γ "
+     "values are non-zero, so the network does use the refinement; it may matter more on cluttered field photos."),
     ("Why classification for the main numbers if the project is about detection?",
      "Each PlantVillage image contains exactly one centred leaf, so 'which disease?' is an image-level question. "
      "We report both: a classifier (accuracy, F1, AUC) and a detector (mAP, plus image-level accuracy for a fair "
@@ -720,8 +753,8 @@ QA = [
     ("How does the irrigation logic avoid rapid on/off switching?",
      "Hysteresis: two thresholds (on below 35%, off above 60%) and a 10-minute safety cut-off."),
     ("How long does training take on a CPU?",
-     "~25 s per epoch for the classifier (5,600 images, 128 px, 4 cores), ~7 min in total; each detector ~1 h on a "
-     "35% subset. The original YOLOv5 run took 47 h for 100 epochs at 640 px."),
+     "~25 s per epoch for the classifier (5,600 images, 128 px, 4 cores), ~7 min in total; each detector ~20-25 min "
+     "on a 35% subset at 256 px. The original YOLOv5 run took 47 h for 100 epochs at 640 px."),
     ("What would you do with more time or a GPU?",
      "Full-resolution detector training on all images, 5-fold CV with several seeds, field-photo testing, "
      "quantised on-device models, and severity labels for the health score."),
