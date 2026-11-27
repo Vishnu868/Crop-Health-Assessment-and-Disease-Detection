@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Trains every detector reported in REPORT.md. CPU budget: 35% of the train split, 15 epochs, 256 px (~1 h each).
+# Trains every detector reported in REPORT.md. CPU budget: a class x crop stratified 35% of the train split,
+# 15 epochs, 256 px (~20-25 min each on 4 CPU cores).
 set -u
 cd "$(dirname "$0")/.."
 mkdir -p logs

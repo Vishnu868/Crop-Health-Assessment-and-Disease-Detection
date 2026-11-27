@@ -28,7 +28,7 @@ import torch
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from src.config import CLASSES, DET_IMG_SIZE, MODELS, RESULTS, SEED, YOLO_DIR  # noqa: E402
+from src.config import CLASSES, DET_IMG_SIZE, MODELS, PROCESSED, RESULTS, SEED, YOLO_DIR  # noqa: E402
 from src.models import get_pretrained  # noqa: E402
 from src.sfr import SFRWrap  # noqa: E402
 
@@ -84,6 +84,25 @@ def image_level_eval(weights: Path, split: str = "test", conf: float = 0.25) -> 
                                                output_dict=True, zero_division=0)}
 
 
+def stratified_subset_yaml(fraction: float) -> Path:
+    """Write a data yaml whose train list is a class x crop stratified subset of the train split.
+
+    Ultralytics' own ``fraction=`` keeps the *first* N files in sorted order; our file names start with
+    the crop (Apple__, Cherry__, ...), so that would silently drop whole crops (and classes) from training.
+    """
+    import pandas as pd
+    df = pd.read_csv(PROCESSED / "splits.csv")
+    tr = df[df["split"] == "train"]
+    sub = tr.groupby(["class", "source"]).sample(frac=fraction, random_state=SEED)
+    lst = YOLO_DIR / f"train_subset_{int(round(fraction * 100))}.txt"
+    lst.write_text("".join(f"{(YOLO_DIR / 'images' / 'train' / f).absolute()}\n" for f in sorted(sub["file"])))
+    yml = YOLO_DIR / f"data_subset_{int(round(fraction * 100))}.yaml"
+    yml.write_text((YOLO_DIR / "data.yaml").read_text().replace("train: images/train", f"train: {lst.name}"))
+    print(f"stratified train subset: {len(sub)}/{len(tr)} images ->", yml)
+    print(sub.groupby("class").size().to_dict())
+    return yml
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--arch", default="yolo26n", choices=["yolo26n", "yolo11n", "yolov5nu"])
@@ -102,9 +121,10 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     runs = Path("runs") / "detect"
     t0 = time.time()
+    data_yaml = YOLO_DIR / "data.yaml" if args.fraction >= 1 else stratified_subset_yaml(args.fraction)
     model = YOLO(str(get_pretrained(f"{args.arch}.pt")))
-    model.train(data=str(YOLO_DIR / "data.yaml"), epochs=args.epochs, imgsz=args.imgsz, batch=args.batch,
-                device="cpu", workers=args.workers, seed=SEED, deterministic=False, fraction=args.fraction,
+    model.train(data=str(data_yaml), epochs=args.epochs, imgsz=args.imgsz, batch=args.batch,
+                device="cpu", workers=args.workers, seed=SEED, deterministic=False,
                 project=str(runs.resolve()), name=name, exist_ok=True, plots=True, patience=100,
                 optimizer="AdamW", lr0=0.002, cos_lr=True, close_mosaic=max(1, args.epochs // 4),
                 trainer=make_trainer(args.sfr), amp=False, verbose=False)
