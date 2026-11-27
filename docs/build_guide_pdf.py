@@ -13,7 +13,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import (Image, KeepTogether, PageBreak, Paragraph, Preformatted, Spacer, Table,
+from reportlab.platypus import (CondPageBreak, Image, KeepTogether, PageBreak, Paragraph, Preformatted, Spacer, Table,
                                 TableStyle)
 from reportlab.platypus.doctemplate import BaseDocTemplate, Frame, PageTemplate
 from reportlab.platypus.tableofcontents import TableOfContents
@@ -516,11 +516,13 @@ FIGURE("cls_per_class.png", "Per-class precision, recall and F1 of the proposed 
 FIGURE("cls_roc.png", "One-vs-rest ROC curves (log-scaled false-positive axis, so the differences are visible).",
        10)
 FIGURE("gradcam.png", "Grad-CAM and SFR attention maps on random test images.")
+story.append(CondPageBreak(7 * cm))
 P("<b>Leaf or background? The robustness test.</b>")
 SIMPLE("We cut each test leaf out and pasted it onto new backgrounds: black, a random flat colour and a random "
        "blotchy texture. The leaf is identical; only the backdrop changes. A model that really looks at the leaf "
        "should not care. Think of recognising a friend's face on a beach and then in a classroom.")
-ROB = load("classification/background_robustness")
+_rp = os.path.join(ROOT, "results", "classification", "background_robustness.json")
+ROB = json.load(open(_rp)) if os.path.exists(_rp) else None
 if ROB:
     TABLE([["Model", "Original", "Black", "Flat colour", "Texture"]] +
           [[CLS_NAMES[k], *[pct(ROB[k][v]["accuracy"], 1) for v in ["original", "black", "flat", "texture"]]]
@@ -532,6 +534,7 @@ TECH("The flat and texture backgrounds are random and were seen by no model in t
      "background-augmented one (which saw only black backgrounds). The background-augmented model is the most "
      "robust on every variant, so it was made the default model of the app "
      "(<font face='DVM'>results/models/yolo26_cls_sfr_bgaug.pt</font>).")
+story.append(CondPageBreak(7 * cm))
 P("<b>Is SFR worth it? Three seeds each.</b>")
 SIMPLE("One run can be lucky. We trained the with- and without-SFR models three times each, with different random "
        "seeds, and compare the averages and the spread.")
