@@ -44,6 +44,9 @@ Individual runs: YOLO26n-cls + SFR seed 42: 99.25% / bg-removed 59.08%; YOLO26n-
 | Model | Params | P | R | mAP@0.5 | mAP@0.5:0.95 | Image-level acc. | No detection | Train time |
 |---|---|---|---|---|---|---|---|---|
 | YOLO26n + SFR (proposed) | 2.56 M | 0.985 | 0.981 | 0.993 | 0.958 | 98.58% | 0 | 22 min |
+| YOLO26n | 2.54 M | 0.980 | 0.982 | 0.993 | 0.957 | 97.92% | 0 | 23 min |
+| YOLO11n | 2.61 M | 0.982 | 0.975 | 0.990 | 0.953 | 98.50% | 0 | 19 min |
+| YOLOv5n (original arch.) | 2.64 M | 0.980 | 0.987 | 0.993 | 0.956 | 98.83% | 0 | 19 min |
 
 Per-class detection AP (proposed model):
 

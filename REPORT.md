@@ -340,6 +340,9 @@ background-dependent one.
 | Detector | Params | P | R | mAP@0.5 | mAP@0.5:0.95 | Image-level acc. | Train time |
 |---|---|---|---|---|---|---|---|
 | **YOLO26n + SFR (proposed)** | 2.56 M | 0.985 | 0.981 | 0.993 | 0.958 | 98.58% | 22 min |
+| YOLO26n | 2.54 M | 0.980 | 0.982 | 0.993 | 0.957 | 97.92% | 23 min |
+| YOLO11n | 2.61 M | 0.982 | 0.975 | 0.990 | 0.953 | 98.50% | 19 min |
+| YOLOv5n (original project's family) | 2.64 M | 0.980 | 0.987 | 0.993 | 0.956 | 98.83% | 19 min |
 
 Per-class test results of YOLO26n + SFR:
 
@@ -351,7 +354,7 @@ Per-class test results of YOLO26n + SFR:
 | Late_Blight | 0.996 | 0.952 | 0.995 | 0.948 |
 | Powder_Mildew | 0.989 | 0.988 | 0.988 | 0.978 |
 
-*YOLO26n, YOLO11n and YOLOv5n detectors (same settings) are still training; their rows will be added here.*
+All four detectors are within 0.003 mAP@0.5 and 0.9 points of image-level accuracy of each other. On single-leaf images with one whole-leaf box the task is nearly saturated, and **SFR gives no measurable gain in detection either**. The first attempt, whose training subset silently dropped whole crops, reached only mAP@0.5 ≈ 0.45 and about 49% accuracy (§8.5).
 <!-- DET_END -->
 
 ![Detector comparison](docs/figures/det_model_comparison.png)

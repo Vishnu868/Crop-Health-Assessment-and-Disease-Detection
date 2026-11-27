@@ -582,7 +582,8 @@ NOTE(["The repository also contains a bar chart of 93-99% per-class precision/re
       "is in the repository."], "About the original figures")
 P("<b>Why our numbers are much higher than the original mAP of 0.743.</b> (1) Our boxes are derived from the "
   "segmentation masks, one per image and pixel-consistent, while the original used hand-drawn Roboflow boxes, "
-  "several per image. (2) The newer YOLO generations and ImageNet/COCO pretraining help. (3) Our images are "
+  "several per image. (2) COCO pretraining and the current Ultralytics training recipe help, while the "
+  "architecture barely matters here: our YOLOv5n scores the same as YOLO26n. (3) Our images are "
   "256×256 single-leaf photos without the original export's extra augmentation. The task is therefore easier. "
   "The improvement does not mean the original model was badly trained.")
 
@@ -744,8 +745,8 @@ QA = [
      "From PlantVillage's background-removed images: the leaf mask's bounding rectangle. One box per image. This "
      "is automatic labelling, and it is easier than the original hand-drawn multi-box Roboflow labels."),
     ("Why is your mAP so much higher than the original 0.743?",
-     "Different labels (automatic single boxes vs hand-drawn multiple boxes), a different split, newer "
-     "architectures and pretraining. The numbers are not directly comparable, and we say so."),
+     "Different labels (automatic single boxes vs hand-drawn multiple boxes) and a different split. It is not "
+     "the architecture: our YOLOv5n scores the same as YOLO26n (all four detectors are within 0.003 mAP@0.5). The numbers are not directly comparable, and we say so."),
     ("What does the background-removed test show?",
      "Accuracy collapses when the lab background is removed, so part of the model's accuracy comes from "
      "background, lighting and crop identity. Training with background augmentation reduces the gap. Field "
