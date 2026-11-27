@@ -1,0 +1,20 @@
+:root { --bg:#f4f7f2; --card:#fff; --ink:#1d2b1f; --muted:#5f6f62; --accent:#2e7d32; --warn:#b26a00; --line:#dfe6dc; }
+@media (prefers-color-scheme: dark) { :root { --bg:#111712; --card:#1a221b; --ink:#e6efe6; --muted:#9db09f; --accent:#66bb6a; --warn:#ffb74d; --line:#2c372d; } }
+* { box-sizing: border-box; }
+body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--ink); }
+header { padding:24px 16px 8px; max-width:760px; margin:auto; }
+header h1 { margin:0; color:var(--accent); } header p { margin:4px 0 0; color:var(--muted); }
+main { max-width:760px; margin:auto; padding:8px 16px 32px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:14px 0; }
+h2 { font-size:1.1rem; margin:0 0 12px; } h3 { font-size:.95rem; margin:18px 0 6px; }
+form { display:flex; gap:10px; flex-wrap:wrap; }
+button { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:9px 18px; font-weight:600; cursor:pointer; }
+#preview { max-width:100%; max-height:260px; margin-top:12px; border-radius:10px; }
+.disease { font-size:1.4rem; font-weight:700; margin:0; }
+.badge { font-size:.85rem; background:var(--accent); color:#fff; border-radius:99px; padding:2px 10px; vertical-align:middle; }
+.warn { color:var(--warn); }
+.bars .row { display:grid; grid-template-columns:130px 1fr 54px; gap:8px; align-items:center; margin:4px 0; font-size:.9rem; }
+.bars .track, .meter { background:var(--line); border-radius:6px; height:10px; overflow:hidden; }
+.bars .fill, #healthbar { background:var(--accent); height:100%; }
+dl { margin:0; } dt { font-weight:600; margin-top:8px; } dd { margin:2px 0 0; color:var(--muted); }
+.muted { color:var(--muted); } .small { font-size:.8rem; }

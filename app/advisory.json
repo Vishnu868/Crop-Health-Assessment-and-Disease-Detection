@@ -1,0 +1,47 @@
+{
+  "Bacterial_spot": {
+    "disease": "Bacterial Spot",
+    "pathogen": "Xanthomonas spp. (tomato, pepper); Xanthomonas arboricola pv. pruni (peach)",
+    "symptoms": "Small, water-soaked, dark brown-black leaf spots, often with a yellow halo; spots may merge and leaves drop.",
+    "fertilizer": "Balanced NPK 19-19-19 at label rate; avoid excess nitrogen, which produces soft, susceptible growth. Add calcium (calcium nitrate) to strengthen tissue.",
+    "pesticide": "Copper-based bactericide (copper hydroxide or copper oxychloride), optionally tank-mixed with mancozeb. Rotate products and follow the label and local regulations.",
+    "precautions": "Use certified disease-free seed and transplants; avoid overhead irrigation and working in wet foliage; remove infected debris; rotate crops for 2-3 years.",
+    "severity_hint": "Spreads fast in warm, wet weather (24-30 C)."
+  },
+  "Black_rot": {
+    "disease": "Black Rot",
+    "pathogen": "Botryosphaeria obtusa (apple); Guignardia bidwellii (grape)",
+    "symptoms": "Purple-bordered 'frog-eye' leaf spots on apple; tan-brown circular lesions with dark margins on grape leaves; fruit rot and mummies.",
+    "fertilizer": "Potassium-rich fertiliser (e.g. sulphate of potash) to improve tissue strength; keep nitrogen moderate.",
+    "pesticide": "Protectant fungicides such as captan or mancozeb; myclobutanil for curative action. Follow the label and local regulations.",
+    "precautions": "Prune out cankers and dead wood; remove mummified fruit; improve airflow by pruning; destroy fallen leaves.",
+    "severity_hint": "Infection risk peaks during warm, rainy periods in spring."
+  },
+  "Healthy": {
+    "disease": "Healthy",
+    "pathogen": "None detected",
+    "symptoms": "Uniform green colour, no lesions detected.",
+    "fertilizer": "Continue the normal nutrient schedule based on a soil test (e.g. NPK 20-20-20 foliar feed every 2-3 weeks during active growth).",
+    "pesticide": "No pesticide needed. Keep monitoring.",
+    "precautions": "Keep monitoring weekly; maintain good field hygiene, balanced irrigation and crop rotation.",
+    "severity_hint": "No action required."
+  },
+  "Late_Blight": {
+    "disease": "Late Blight",
+    "pathogen": "Phytophthora infestans (potato, tomato)",
+    "symptoms": "Large, greasy, grey-green to brown lesions, often with white sporulation on the underside in humid conditions; rapid collapse of foliage.",
+    "fertilizer": "Avoid excess nitrogen; apply potassium and phosphorus (e.g. NPK 10-26-26) to support tuber and fruit development.",
+    "pesticide": "Systemic plus contact fungicides such as metalaxyl-M + mancozeb, cymoxanil + mancozeb, or chlorothalonil. Follow the label and local regulations.",
+    "precautions": "Destroy infected plants and volunteer potatoes; use resistant varieties; ensure good drainage and spacing; avoid evening irrigation.",
+    "severity_hint": "Can destroy a field within 1-2 weeks in cool (10-25 C), humid weather. Act immediately."
+  },
+  "Powder_Mildew": {
+    "disease": "Powdery Mildew",
+    "pathogen": "Podosphaera spp. (cherry, squash) and other Erysiphales",
+    "symptoms": "White to grey powdery fungal growth on leaf surfaces; leaves may yellow, curl and dry.",
+    "fertilizer": "Avoid excessive nitrogen; use balanced NPK with adequate potassium. Foliar potassium bicarbonate also suppresses mildew.",
+    "pesticide": "Wettable sulphur, potassium bicarbonate, or systemic fungicides such as hexaconazole or myclobutanil. Follow the label and local regulations.",
+    "precautions": "Improve air circulation and sunlight; remove heavily infected leaves; avoid dense planting; water at the base of plants.",
+    "severity_hint": "Favoured by dry leaves with high humidity and moderate temperatures (20-27 C)."
+  }
+}

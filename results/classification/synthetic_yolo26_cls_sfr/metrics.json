@@ -1,0 +1,132 @@
+{
+  "model": "yolo26_cls_sfr",
+  "data": "synthetic",
+  "pretrained": true,
+  "params": 1558187,
+  "epochs": 3,
+  "train_size": 429,
+  "val_size": 89,
+  "test_size": 82,
+  "train_minutes": 0.09589268366495768,
+  "best_val_macro_f1": 0.8693512792117442,
+  "test": {
+    "accuracy": 0.9146341463414634,
+    "macro_f1": 0.9200871459694989,
+    "confusion_matrix": [
+      [
+        11,
+        5,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        19,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        16,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        14,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        15
+      ]
+    ],
+    "per_class": {
+      "Bacterial_spot": {
+        "precision": 1.0,
+        "recall": 0.6875,
+        "f1-score": 0.8148148148148148,
+        "support": 16.0
+      },
+      "Black_rot": {
+        "precision": 0.7307692307692307,
+        "recall": 1.0,
+        "f1-score": 0.8444444444444444,
+        "support": 19.0
+      },
+      "Healthy": {
+        "precision": 1.0,
+        "recall": 0.8888888888888888,
+        "f1-score": 0.9411764705882353,
+        "support": 18.0
+      },
+      "Late_Blight": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 14.0
+      },
+      "Powder_Mildew": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 15.0
+      },
+      "accuracy": 0.9146341463414634,
+      "macro avg": {
+        "precision": 0.9461538461538461,
+        "recall": 0.9152777777777779,
+        "f1-score": 0.9200871459694989,
+        "support": 82.0
+      },
+      "weighted avg": {
+        "precision": 0.9376172607879926,
+        "recall": 0.9146341463414634,
+        "f1-score": 0.9149104628301186,
+        "support": 82.0
+      }
+    },
+    "macro_auc_ovr": 0.9996212121212121
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.2791166603565216,
+      "train_acc": 0.4739583333333333,
+      "val_loss": 1.5600895881652832,
+      "val_acc": 0.449438202247191,
+      "val_macro_f1": 0.3917836257309942,
+      "seconds": 1.907900333404541
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5482790768146515,
+      "train_acc": 0.8776041666666666,
+      "val_loss": 1.5785084962844849,
+      "val_acc": 0.5730337078651685,
+      "val_macro_f1": 0.5323858742463393,
+      "seconds": 1.704420566558838
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.3853303790092468,
+      "train_acc": 0.96875,
+      "val_loss": 0.36319437623023987,
+      "val_acc": 0.8651685393258427,
+      "val_macro_f1": 0.8693512792117442,
+      "seconds": 2.031106472015381
+    }
+  ],
+  "sfr_gamma": [
+    0.004327751696109772,
+    -0.00435465294867754
+  ]
+}
