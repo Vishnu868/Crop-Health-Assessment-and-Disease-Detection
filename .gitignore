@@ -1,0 +1,11 @@
+data/raw/
+data/processed/
+data/yolo/
+runs/
+outputs/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.part
+weights/
+logs/

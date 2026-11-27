@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroDoc · Leaf Disease Check</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+  <h1>🌿 AgroDoc</h1>
+  <p>Crop health assessment &amp; plant disease detection (YOLO26 + SFR)</p>
+</header>
+<main>
+  <section class="card">
+    <h2>1 · Upload a leaf photo</h2>
+    <form id="form">
+      <input id="file" type="file" accept="image/*" capture="environment" required>
+      <button type="submit">Diagnose</button>
+    </form>
+    <img id="preview" alt="" hidden>
+  </section>
+  <section class="card" id="result" hidden>
+    <h2>2 · Diagnosis</h2>
+    <p class="disease"><span id="disease"></span> <span id="conf" class="badge"></span></p>
+    <p id="warn" class="warn" hidden>Low confidence: retake the photo of a single leaf on a plain background.</p>
+    <div class="bars" id="top3"></div>
+    <h3>Leaf health</h3>
+    <div class="meter"><div id="healthbar"></div></div>
+    <p class="muted" id="healthtxt"></p>
+    <h3>Advisory</h3>
+    <dl>
+      <dt>Symptoms</dt><dd id="symptoms"></dd>
+      <dt>Fertilizer</dt><dd id="fertilizer"></dd>
+      <dt>Pesticide</dt><dd id="pesticide"></dd>
+      <dt>Precautions</dt><dd id="precautions"></dd>
+    </dl>
+  </section>
+  <section class="card">
+    <h2>Field sensors</h2>
+    <div id="sensors" class="muted">Waiting for NodeMCU readings…</div>
+  </section>
+  <p class="muted small">Advisory text is general guidance. Always follow the product label and local agricultural extension advice.</p>
+</main>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
