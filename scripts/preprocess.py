@@ -57,12 +57,39 @@ def process(args: tuple[str, str, str]) -> dict | None:
             "_x": small, "_xs": seg_small}
 
 
+def _health_job(args: tuple[str, str, str]) -> dict:
+    raw, cls, fname = args
+    rgb = load_rgb(Path(raw) / "color" / cls / fname)
+    seg_path = Path(raw) / "segmented" / cls / fname
+    seg = load_rgb(seg_path) if seg_path.exists() else None
+    if seg is not None and seg.shape != rgb.shape:
+        seg = cv2.resize(seg, (rgb.shape[1], rgb.shape[0]))
+    return {"file": fname, **health_indices(rgb, leaf_mask(rgb, seg))}
+
+
+def update_health(raw: Path, workers: int) -> None:
+    df = pd.read_csv(PROCESSED / "splits.csv")
+    jobs = [(str(raw), r["class"], r["file"]) for _, r in df.iterrows()]
+    with ProcessPoolExecutor(max_workers=workers) as ex:
+        rows = [f.result(timeout=120) for f in [ex.submit(_health_job, j) for j in jobs]]
+    h = pd.DataFrame(rows).set_index("file")
+    for col in h.columns:
+        df[col] = df["file"].map(h[col])
+    df.to_csv(PROCESSED / "splits.csv", index=False)
+    print(df.groupby("class")[["health_score", "vari", "exg"]].median())
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw", default=str(RAW))
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
+    ap.add_argument("--health-only", action="store_true",
+                    help="only recompute the health-index columns of an existing splits.csv")
     args = ap.parse_args()
     raw = Path(args.raw)
+    if args.health_only:
+        update_health(raw, args.workers)
+        return
 
     man = pd.read_csv(raw / "manifest.csv")
     jobs = [(str(raw), r["class"], r["file"]) for _, r in man.iterrows()]
