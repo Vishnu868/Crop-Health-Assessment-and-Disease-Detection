@@ -10,6 +10,11 @@ All numbers: held-out **test split, 1,200 real PlantVillage images** (240 per cl
 | Colour+texture + LogReg | - | - | 90.67% | 90.66% | 0.9881 | - | 0.2 min |
 | Colour+texture + RF | - | - | 95.67% | 95.63% | 0.9966 | - | 0.2 min |
 | YOLO26n-cls + SFR (proposed) | ImageNet | 1.56 M | 99.25% | 99.25% | 0.9996 | 59.08% | 10.0 min |
+| YOLO26n-cls | ImageNet | 1.54 M | 99.33% | 99.33% | 1.0000 | 82.67% | 7.7 min |
+| YOLO11n-cls + SFR | ImageNet | 1.56 M | 99.50% | 99.50% | 1.0000 | 84.33% | 6.3 min |
+| YOLO11n-cls | ImageNet | 1.54 M | 99.50% | 99.50% | 1.0000 | 85.83% | 5.7 min |
+| YOLO26n-cls + SFR, no pretraining | no | 1.56 M | 97.33% | 97.33% | 0.9980 | 52.58% | 5.8 min |
+| Small CNN (scratch) | no | 0.66 M | 98.58% | 98.58% | 0.9996 | 62.50% | 44.5 min |
 
 Per-class classification report (YOLO26n-cls + SFR):
 ```

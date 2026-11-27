@@ -1,7 +1,7 @@
 {
   "model": "small_cnn",
   "data": "real",
-  "pretrained": true,
+  "pretrained": false,
   "params": 661421,
   "bg_aug": 0.0,
   "epochs": 20,

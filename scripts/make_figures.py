@@ -195,7 +195,7 @@ def fig_classification(res):
     ax.set_xlim(0, 108)
     ax.set_xlabel("test set (%), 1,200 images")
     ax.set_title("Classifier comparison on the held-out test split")
-    ax.legend(loc="lower right", ncols=2)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.13), ncols=2)
     ax.grid(axis="y", visible=False)
     save(fig, "cls_model_comparison.png")
 
@@ -210,7 +210,8 @@ def fig_classification(res):
     axes[0].set_xlabel("epoch")
     axes[1].set_title("Validation accuracy (%)", fontsize=10)
     axes[1].set_xlabel("epoch")
-    axes[1].set_ylim(60, 100.5)
+    axes[1].set_ylim(50, 100.5)
+    axes[0].set_ylim(0, 1.5)
     axes[1].legend(fontsize=7, loc="lower right")
     save(fig, "cls_training_curves.png")
 

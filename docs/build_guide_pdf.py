@@ -577,6 +577,8 @@ H1("The Application and IoT Layer")
 SIMPLE("The model is useful only if farmers can reach it. Three 'front doors' lead to the same server: the "
        "phone app, a web page, and the ESP32-CAM camera in the field. The server answers in plain language, and "
        "a second little board looks after watering.")
+FIGURE("web_interface.png", "The web interface running locally with the trained model on a real potato "
+       "late-blight test image. The sensor panel shows a reading posted to /api/sensors.", 10.5)
 TABLE([["Component", "File", "Role"],
        ["Flask API", "app/app.py", "POST /predict (multipart or base64 JSON), POST/GET /api/sensors, GET /api/health"],
        ["Web interface", "app/templates/index.html, app/static/*", "upload, diagnosis, top-3 bars, health meter, "

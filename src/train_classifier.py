@@ -164,7 +164,8 @@ def main() -> None:
 
     model.load_state_dict(best_state)
     tp, ty = predict(model, test_dl)
-    res = {"model": args.model, "data": args.data, "pretrained": not args.no_pretrained,
+    res = {"model": args.model, "data": args.data,
+           "pretrained": (not args.no_pretrained) and args.model != "small_cnn",
            "params": n_params, "bg_aug": args.bg_aug, "epochs": args.epochs, "train_size": len(tr), "val_size": len(va),
            "test_size": len(te), "train_minutes": (time.time() - t_start) / 60, "best_val_macro_f1": best_f1,
            "test": metrics(tp, ty), "history": history}
